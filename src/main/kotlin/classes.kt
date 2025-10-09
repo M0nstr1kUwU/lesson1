@@ -69,19 +69,30 @@ fun main(){
     // НАСТРОЙКА ОБЪЕКТОВ
     player.name = "Aleg"
     player.health = 100
-    player.attack = 18
+    player.attack = 10
 
     monster.name = "Патапим-Патапум"
     monster.health = 100
-    monster.attack = 12
+    monster.attack = 10
 
 
     // ВЫЗОВ МЕТОДОМ ОБЪЕКТОВ
     println(">>> Вы вступаете в бой с ${monster.name} <<<")
+    var action: Int = 0
 
     while (player.health > 0 && monster.health > 0){
+        println("Действия: 1-Атака, 2-Лечиться, 3-Зелье")
+        action = readln().toInt()
+        if (action == 1) {
+            player.attack(monster)
+        }
+        else if (action == 2){
+            player.heal(20)
+        }
+        else if (action == 3){
+            player.use_potion(player.potion_count)
+        }
 
-        player.attack(monster)
         monster.attack(player)
 
         println("${player.name} HP: ${player.health} ТЫ ЖИВОЙ? (${player.isAlive})")
