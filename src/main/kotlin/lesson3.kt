@@ -56,7 +56,7 @@ open class Character(
         target.takeDamage(damage)
     }
 
-    fun printStatus(){
+    open fun printStatus(className: String){
         val status = if (isAlive) "Жив" else "Мёртв"
         println("| $name: $_health/$_maxHealth HP | ATK: $_attack ($status)")
     }
@@ -73,6 +73,21 @@ class Warrior(name: String, maxHealth: Int, baseAttack: Int): Character(name, ma
         val reducedDamage = (damage - armor).coerceAtLeast(0)
         println("> $name поглощает $armor урона!")
         super.takeDamage(reducedDamage) // super - вызов метода родительского класса
+    }
+
+    fun amplifierDamage(target: Character){
+        if (!isAlive) return
+        val cost = 5
+        if (_health - cost >= 0){
+            _health -= cost
+            val damage = calculateDamage(_attack + 15)
+            println("> $name вкладывает свою жизненную силу в атаку!")
+            println("> $name атакует ${target.name} с увеличенным уроном: $damage")
+            target.takeDamage(damage)
+        }else{
+            println("> $name ты слишком устал для усиленной атаки!")
+            attack(target)
+        }
     }
 
     fun berserk(target: Character){
@@ -112,7 +127,7 @@ class Mage(name: String, maxHealth: Int, baseAttack: Int): Character(name, maxHe
             mana -= cost
             val damage = calculateDamage(_attack + 5)
             println("> $name вкладывает ману в атаку!")
-            println("> $name атакует ${target.name} с увеличенным уроном уроном: $damage")
+            println("> $name атакует ${target.name} с увеличенным уроном: $damage")
             target.takeDamage(damage)
         }else{
             println("> $name ты слишком устал для усиленной атаки!")
@@ -137,6 +152,44 @@ class Mage(name: String, maxHealth: Int, baseAttack: Int): Character(name, maxHe
 }
 
 
+// КЛАСС-НАСЛЕДНИК TANK
+class Tank(name: String, maxHealth: Int, baseAttack: Int, maxStamina: Int): Character(name, maxHealth, baseAttack){
+    private var armor: Int = 10
+    private var stamina: Int = maxStamina
+
+    // Перезапишем стандартный метод получения урона
+    override fun takeDamage(damage: Int) {
+        if (!isAlive) return
+        val actualDamage = (damage - armor).coerceAtLeast(0)
+        println("> $name получает уменьшенный урон: -$actualDamage HP! (Armor: $armor)")
+        super.takeDamage(actualDamage) // super - вызов метода родительского класса
+    }
+
+    fun amplifierDamage(target: Character){
+        if (!isAlive) return
+        val cost = 5
+        if (stamina - cost >= 0){
+            stamina -= cost
+            val damage = calculateDamage(_attack + 5)
+            println("> $name вкладывает свою энергию в атаку!")
+            println("> $name атакует ${target.name} с увеличенным уроном: $damage")
+            target.takeDamage(damage)
+        }else{
+            println("> $name ты слишком устал для усиленной атаки!")
+            attack(target)
+        }
+    }
+
+    override fun heal(amount: Int) {
+        if (!isAlive) return
+        val healAmount = amount.coerceAtLeast(0)
+        _health = (_health + (healAmount - 15)).coerceAtMost(_maxHealth)
+        println("> $name похилился на $healAmount HP")
+        super.heal(amount)
+    }
+}
+
+
 fun calculateDamage(baseAttack: Int): Int{
     val variation = Random.nextInt(80, 121)
     return (baseAttack * variation) / 100
@@ -144,7 +197,7 @@ fun calculateDamage(baseAttack: Int): Int{
 
 fun main(){
     println(">>>!БОЙ НАЧИНАЕТСЯ!<<<")
-    val player = Mage("M0nstr1k", 100, 20)
+    val player = Warrior("M0nstr1k", 100, 20)
     val enemy = Warrior("Lord Demons", 100, 20)
     var turns = 1
 
@@ -152,10 +205,10 @@ fun main(){
         println("\nTurns: $turns")
 
         println("\n>=========================================<")
-        player.printStatus()
-        enemy.printStatus()
+
+
         println(">=========================================<\n")
-        println("Actions: 1-Attack, 2-Heal, 3-Amplifier-Attack, 4-Fireball: ")
+        println("Actions: 1-Attack, 2-Heal, 3-Special-Attack, 4-Special-Ability: ")
 
         val action_player = readln().toInt()
         println(">------------------------<")
@@ -169,7 +222,7 @@ fun main(){
             player.amplifierDamage(enemy)
         }
         else if (action_player == 4){
-            player.fireball(enemy)
+            player.berserk(enemy)
         }
         else{
             println("Неверный выбор!")
