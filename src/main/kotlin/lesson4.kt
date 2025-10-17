@@ -65,6 +65,30 @@ class Inventory{
         }
     }
 
+    fun actionsInventory(action: Int, player: Player){
+        val actionIndex = action - 1
+
+        if (actionIndex in 0 until items.size) {
+            val item = items[actionIndex]
+            item.displayInfo()
+            println("\t1.Использовать |" +
+                    "\t2.Выбросить |" +
+                    "\t0.Назад")
+            val action_use = readln().toInt()
+            when (action_use) {
+                1 -> {
+                    useItem(actionIndex, player)
+                }
+                2 -> {
+                    removeItem(actionIndex)
+                }
+                0 -> return
+            }
+        } else {
+            println("Предмет не найден")
+        }
+    }
+
     // Item? - возможность возврата null значения
     fun findItemId(itemId: String): Item?{
         return items.find{it.id == itemId}
@@ -161,6 +185,28 @@ fun calculateDamage(baseAttack: Int): Int{
 }
 
 
+fun inventoryPlayer(player: Player){
+    while (true){
+        player.showInventory()
+        val action = readln().toInt()
+        if (action == 0){
+            break
+        }
+        player.inventory.actionsInventory(action, player)
+    }
+
+}
+
+class Enemy(name: String, health: Int, attack: Int): Character(name, health, attack){
+    var damage = attack
+}
+
+fun battle(player: Player, enemy: Enemy){
+
+}
+
+
+
 fun main(){
     println("\n === ИГРА С СИСТЕМОЙ ИНВЕНТАРЯ ===")
 
@@ -203,8 +249,6 @@ fun main(){
     player.pickUpItem(healthPotion)
 
 
-    player.showInventory()
-
     player.inventory.useItem(0, player)
 
     println("${player.name} набрёл на дверь!")
@@ -215,6 +259,23 @@ fun main(){
         println("Заперто. Нужно найти ключ от этой двери!")
     }
 
-    player.showInventory()
+    player.pickUpItem(oldKey)
+
+    while (true){
+        println("Действия:\n" +
+                "1.Инвентарь\n" +
+                "2.В бой!\n" +
+                "3.beta\n" +
+                "4.beta\n" +
+                "0.Выход"
+        )
+        val actions = readln().toInt()
+        when (actions){
+            1 -> {
+                inventoryPlayer(player)
+            }
+            0 -> break
+        }
+    }
 }
 
