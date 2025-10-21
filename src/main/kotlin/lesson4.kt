@@ -168,6 +168,7 @@ open class Character(
 class Player(name: String, health: Int, attack: Int): Character(name, health, attack){
     var damage = attack
     val inventory = Inventory()
+    val questManager = QuestManager()
 
     fun pickUpItem(item: Item){
         inventory.addItem(item)
