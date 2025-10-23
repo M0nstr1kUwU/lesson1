@@ -160,7 +160,7 @@ open class Character(
 
     open fun shield(target: Character){ //
         if (!isAlive || !target.isAlive) return
-        val damage = target.attack / 2
+        val damage = calculateDamage(target._attack) / 2
         _health -= damage
         println("$name выставляет щит и получает в 2 раза меньше изначального урона ${target.name}!")
     }
