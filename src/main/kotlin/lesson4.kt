@@ -1,6 +1,6 @@
 import java.security.cert.TrustAnchor
 import kotlin.random.Random
-
+import kotlin.math.roundToInt
 
 class Item(
     val id: String,
@@ -158,6 +158,13 @@ open class Character(
         target.takeDamage(damage)
     }
 
+    open fun shield(target: Character){ //
+        if (!isAlive || !target.isAlive) return
+        val damage = target.attack / 2
+        _health -= damage
+        println("$name выставляет щит и получает в 2 раза меньше изначального урона ${target.name}!")
+    }
+
     open fun printStatus(){
         val status = if (isAlive) "Жив" else "Мёртв"
         println("| $name: $_health/$_maxHealth HP | ATK: $_attack ($status)")
@@ -165,10 +172,12 @@ open class Character(
 }
 
 
-class Player(name: String, health: Int, attack: Int): Character(name, health, attack){
+class Player(name: String, health: Int, attack: Int, start_money: Int): Character(name, health, attack){
     var damage = attack
     val inventory = Inventory()
     val questManager = QuestManager()
+    var money = start_money
+    var count_shield = 1
 
     fun pickUpItem(item: Item){
         inventory.addItem(item)
@@ -195,7 +204,6 @@ fun inventoryPlayer(player: Player){
         }
         player.inventory.actionsInventory(action, player)
     }
-
 }
 
 class Enemy(name: String, health: Int, attack: Int): Character(name, health, attack){
@@ -211,7 +219,7 @@ fun battle(player: Player, enemy: Enemy){
 fun main(){
     println("\n === ИГРА С СИСТЕМОЙ ИНВЕНТАРЯ ===")
 
-    val player = Player("M0nstr1k", 100, 10)
+    val player = Player("M0nstr1k", 100, 10, 0)
 
     val healthPotion = Item(
         "health_potion",

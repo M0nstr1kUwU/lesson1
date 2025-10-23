@@ -27,12 +27,13 @@ class Quest(
         isCompleted = true
         isActive = false
 
-        println("\n КВЕСТ ВЫПОЛНЕНУСПЕШНО: $name")
+        println("\n КВЕСТ ВЫПОЛНЕН УСПЕШНО: $name")
         println("Награда:")
 
         if (rewardGold > 0){
             println("- Золото: $rewardGold")
             // Реализация золота в кошелёк игрока
+            player.money += rewardGold
         }
 
         if (rewardItem != null){
@@ -99,7 +100,7 @@ class QuestManager{
 class NPC(val name: String, val description: String){
     private  val dialogues = mutableMapOf<String, String>()
 
-    fun addDialoque(playerPrase: String, npcResponse: String){
+    fun addDialogue(playerPrase: String, npcResponse: String){
         dialogues[playerPrase] = npcResponse
     }
     fun talk(){
